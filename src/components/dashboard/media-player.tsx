@@ -9,9 +9,9 @@ import { Music4 } from "lucide-react";
 
 const focusMusic = [
   { title: "Lofi Hip Hop Radio", embedUrl: "https://www.youtube.com/embed/jfKfPfyJRdk", id: "jfKfPfyJRdk" },
-  { title: "Ambient Study Music", embedUrl: "https://www.youtube.com/embed/MD_89c-_f_4", id: "MD_89c-_f_4" },
-  { title: "Classical for Focus", embedUrl: "https://www.youtube.com/embed/s_6dQt8w_ic", id: "s_6dQt8w_ic" },
-  { title: "Deep Focus Playlist", embedUrl: "https://www.youtube.com/embed/5qap5aO4i9A", id: "5qap5aO4i9A" },
+  { title: "Relaxing Ambient Music", embedUrl: "https://www.youtube.com/embed/B1T06UhcX0Q", id: "B1T06UhcX0Q" },
+  { title: "Rain Sounds for Sleep & Study", embedUrl: "https://www.youtube.com/embed/85g5-L0E628", id: "85g5-L0E628" },
+  { title: "4K Deep Focus Music", embedUrl: "https://www.youtube.com/embed/4oStw0r33so", id: "4oStw0r33so" },
 ];
 
 export function MediaPlayer() {
