@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Music4 } from "lucide-react";
 
 const focusMusic = [
@@ -16,7 +17,28 @@ const focusMusic = [
 
 export function MediaPlayer() {
   const [currentTrack, setCurrentTrack] = useState(focusMusic[0]);
-  
+  const [playlistUrl, setPlaylistUrl] = useState("");
+  const [youtubeEmbedUrl, setYoutubeEmbedUrl] = useState("https://www.youtube.com/embed/jfKfPfyJRdk");
+
+  const handleLoadPlaylist = () => {
+    try {
+      const url = new URL(playlistUrl);
+      const playlistId = url.searchParams.get("list");
+      if (playlistId) {
+        setYoutubeEmbedUrl(`https://www.youtube.com/embed/videoseries?list=${playlistId}`);
+      } else {
+        // Handle single video URLs as a fallback
+        const videoId = url.searchParams.get("v");
+        if (videoId) {
+           setYoutubeEmbedUrl(`https://www.youtube.com/embed/${videoId}`);
+        }
+      }
+    } catch (error) {
+      console.error("Invalid YouTube URL", error);
+      // Optionally, set an error state and show it to the user
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -73,13 +95,21 @@ export function MediaPlayer() {
             </div>
           </TabsContent>
 
-          <TabsContent value="youtube" className="mt-4">
+          <TabsContent value="youtube" className="mt-4 space-y-4">
+             <div className="flex items-center gap-2">
+                <Input
+                    placeholder="Enter YouTube playlist or video URL..."
+                    value={playlistUrl}
+                    onChange={(e) => setPlaylistUrl(e.target.value)}
+                />
+                <Button onClick={handleLoadPlaylist}>Load</Button>
+            </div>
             <AspectRatio ratio={16 / 9}>
               <iframe
-                key={currentTrack.id}
+                key={youtubeEmbedUrl}
                 width="100%"
                 height="100%"
-                src={currentTrack.embedUrl}
+                src={youtubeEmbedUrl}
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
