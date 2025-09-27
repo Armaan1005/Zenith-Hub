@@ -27,12 +27,16 @@ export default function DashboardPage() {
         <div className="mx-auto grid w-full max-w-screen-2xl grid-cols-1 items-start gap-6 lg:grid-cols-4">
           <div className="grid auto-rows-max items-start gap-6 lg:col-span-3">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <PomodoroTimer
-                pomodoroInterval={pomodoroInterval}
-                setPomodoroInterval={setPomodoroInterval}
-              />
-              <MediaPlayer />
+              <div className="lg:col-span-2">
+                <PomodoroTimer
+                  pomodoroInterval={pomodoroInterval}
+                  setPomodoroInterval={setPomodoroInterval}
+                />
+              </div>
               <ArduinoControl />
+            </div>
+            <div className="grid gap-6">
+               <MediaPlayer />
             </div>
             <div className="grid gap-6 md:grid-cols-2">
               <TaskManager
