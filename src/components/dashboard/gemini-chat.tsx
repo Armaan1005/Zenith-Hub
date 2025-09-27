@@ -108,7 +108,7 @@ export function GeminiChat() {
             </AnimatePresence>
             </div>
         </ScrollArea>
-        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+        <form onSubmit={handleSubmit} className="flex items-stretch gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
