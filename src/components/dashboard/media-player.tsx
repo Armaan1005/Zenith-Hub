@@ -11,7 +11,7 @@ const focusMusic = [
   { title: "Pomodoro with Lofi Girl", embedUrl: "https://www.youtube.com/embed/1oDrJba2PSs", id: "1oDrJba2PSs" },
   { title: "Lofi Hip Hop Radio", embedUrl: "https://www.youtube.com/embed/jfKfPfyJRdk", id: "jfKfPfyJRdk" },
   { title: "Gentle Rain Sounds", embedUrl: "https://www.youtube.com/embed/-OekvEFm1lo", id: "-OekvEFm1lo" },
-  { title: "Deep Focus Music", embedUrl: "https://www.youtube.com/embed/4oStw0r33so", id: "4oStw0r33so" },
+  { title: "Peaceful Piano Radio", embedUrl: "https://www.youtube.com/embed/TtkFsfOP9QI", id: "TtkFsfOP9QI" },
 ];
 
 export function MediaPlayer() {
