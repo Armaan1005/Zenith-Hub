@@ -120,7 +120,7 @@ export function GeminiChat() {
             type="submit"
             size="icon"
             disabled={isPending}
-            className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
+            className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2"
           >
             <Send className="h-4 w-4" />
             <span className="sr-only">Send</span>
