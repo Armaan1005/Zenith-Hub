@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Music4 } from "lucide-react";
 
 const focusMusic = [
+  { title: "Relaxing Rain Sounds", embedUrl: "https://www.youtube.com/embed/1oDrJba2PSs", id: "1oDrJba2PSs" },
   { title: "Lofi Hip Hop Radio", embedUrl: "https://www.youtube.com/embed/jfKfPfyJRdk", id: "jfKfPfyJRdk" },
-  { title: "Relaxing Ambient Music", embedUrl: "https://www.youtube.com/embed/B1T06UhcX0Q", id: "B1T06UhcX0Q" },
-  { title: "Rain Sounds for Sleep & Study", embedUrl: "https://www.youtube.com/embed/85g5-L0E628", id: "85g5-L0E628" },
-  { title: "4K Deep Focus Music", embedUrl: "https://www.youtube.com/embed/4oStw0r33so", id: "4oStw0r33so" },
+  { title: "Peaceful Classical Piano", embedUrl: "https://www.youtube.com/embed/k_Y2_h-gG-c", id: "k_Y2_h-gG-c" },
+  { title: "Deep Focus Music", embedUrl: "https://www.youtube.com/embed/4oStw0r33so", id: "4oStw0r33so" },
 ];
 
 export function MediaPlayer() {
