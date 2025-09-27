@@ -56,13 +56,18 @@ export function TaskManager({ tasks, setTasks, pomodoroInterval }: TaskManagerPr
         <AIPrioritizer tasks={tasks} pomodoroInterval={pomodoroInterval} />
       </CardHeader>
       <CardContent className="flex-1 space-y-4">
-        <form onSubmit={handleAddTask} className="flex gap-2">
+        <form onSubmit={handleAddTask} className="relative">
           <Input
             value={newTaskText}
             onChange={(e) => setNewTaskText(e.target.value)}
             placeholder="Add a new task..."
+            className="pr-12"
           />
-          <Button type="submit" size="icon">
+          <Button
+            type="submit"
+            size="icon"
+            className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
+          >
             <Plus className="h-4 w-4" />
             <span className="sr-only">Add Task</span>
           </Button>
