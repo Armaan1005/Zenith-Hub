@@ -108,14 +108,20 @@ export function GeminiChat() {
             </AnimatePresence>
             </div>
         </ScrollArea>
-        <form onSubmit={handleSubmit} className="flex items-stretch gap-2">
+        <form onSubmit={handleSubmit} className="relative">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask Gemini anything..."
             disabled={isPending}
+            className="pr-12"
           />
-          <Button type="submit" size="icon" disabled={isPending}>
+          <Button
+            type="submit"
+            size="icon"
+            disabled={isPending}
+            className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
+          >
             <Send className="h-4 w-4" />
             <span className="sr-only">Send</span>
           </Button>
