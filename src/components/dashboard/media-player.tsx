@@ -76,9 +76,10 @@ export function MediaPlayer() {
           <TabsContent value="youtube" className="mt-4">
             <AspectRatio ratio={16 / 9}>
               <iframe
+                key={currentTrack.id}
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/jfKfPfyJRdk"
+                src={currentTrack.embedUrl}
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
