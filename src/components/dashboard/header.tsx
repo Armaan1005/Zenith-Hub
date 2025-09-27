@@ -1,4 +1,5 @@
 import { Logo } from "@/components/icons";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Header() {
   return (
@@ -8,6 +9,9 @@ export function Header() {
         <h1 className="font-headline text-xl font-semibold text-foreground">
           Zenith Hub
         </h1>
+      </div>
+      <div className="ml-auto">
+        <ThemeToggle />
       </div>
     </header>
   );
