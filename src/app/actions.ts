@@ -6,7 +6,7 @@ import SpotifyWebApi from 'spotify-web-api-node';
 
 function getSpotifyApi() {
   return new SpotifyWebApi({
-    clientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
+    clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
     redirectUri: process.env.NEXT_PUBLIC_REDIRECT_URI,
   });
