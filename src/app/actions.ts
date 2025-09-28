@@ -4,13 +4,16 @@ import { chatWithGemini, type ChatInput } from "@/ai/flows/chat-with-gemini";
 import { suggestTaskPriorities, type SuggestTaskPrioritiesInput } from "@/ai/flows/suggest-task-priorities";
 import SpotifyWebApi from 'spotify-web-api-node';
 
-const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
-  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  redirectUri: process.env.NEXT_PUBLIC_REDIRECT_URI,
-});
+function getSpotifyApi() {
+  return new SpotifyWebApi({
+    clientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    redirectUri: process.env.NEXT_PUBLIC_REDIRECT_URI,
+  });
+}
 
 export async function getSpotifyAuthUrl() {
+  const spotifyApi = getSpotifyApi();
   const scopes = [
     'streaming',
     'user-read-email',
@@ -23,6 +26,7 @@ export async function getSpotifyAuthUrl() {
 }
 
 export async function getSpotifyAccessToken(code: string) {
+  const spotifyApi = getSpotifyApi();
   try {
     const data = await spotifyApi.authorizationCodeGrant(code);
     return {
@@ -37,6 +41,7 @@ export async function getSpotifyAccessToken(code: string) {
 }
 
 export async function refreshSpotifyAccessToken(refreshToken: string) {
+  const spotifyApi = getSpotifyApi();
   spotifyApi.setRefreshToken(refreshToken);
   try {
     const data = await spotifyApi.refreshAccessToken();
