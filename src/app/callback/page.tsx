@@ -66,7 +66,7 @@ function CallbackContent() {
 
 export default function CallbackPage() {
     return (
-        <Suspense fallback={<p className="text-center mt-8">Loading...</p>}>
+        <Suspense>
             <CallbackContent />
         </Suspense>
     )
