@@ -1,6 +1,5 @@
 
 "use server";
-import "dotenv/config";
 import { chatWithGemini, type ChatInput } from "@/ai/flows/chat-with-gemini";
 import { suggestTaskPriorities, type SuggestTaskPrioritiesInput } from "@/ai/flows/suggest-task-priorities";
 import SpotifyWebApi from 'spotify-web-api-node';
