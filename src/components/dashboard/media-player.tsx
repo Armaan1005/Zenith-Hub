@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Music4 } from "lucide-react";
+import { Music4, ExternalLink } from "lucide-react";
 
 const focusMusic = [
   { title: "Pomodoro with Lofi Girl", embedUrl: "https://www.youtube.com/embed/1oDrJba2PSs", id: "1oDrJba2PSs" },
@@ -119,14 +119,18 @@ export function MediaPlayer() {
             </AspectRatio>
           </TabsContent>
           <TabsContent value="classroom" className="mt-4">
-            <AspectRatio ratio={16 / 9} className="bg-muted">
-              <iframe
-                src="https://classroom.google.com"
-                title="Google Classroom"
-                className="h-full w-full rounded-lg border"
-                allowFullScreen
-              ></iframe>
-            </AspectRatio>
+            <div className="flex h-48 flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 p-4 text-center">
+              <h3 className="text-lg font-semibold">Access Google Classroom</h3>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Click the button to open Google Classroom in a new tab.
+              </p>
+              <Button asChild>
+                <a href="https://classroom.google.com" target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Open Classroom
+                </a>
+              </Button>
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
