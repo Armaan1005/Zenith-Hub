@@ -7,6 +7,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Music4, ExternalLink } from "lucide-react";
+import { SpotifyPlayer } from "./spotify-player";
 
 const focusMusic = [
   { title: "Pomodoro with Lofi Girl", embedUrl: "https://www.youtube.com/embed/1oDrJba2PSs", id: "1oDrJba2PSs" },
@@ -90,10 +91,7 @@ export function MediaPlayer() {
           </TabsContent>
           
           <TabsContent value="spotify" className="mt-4">
-            <div className="flex h-48 flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 text-center">
-              <h3 className="text-lg font-semibold">Coming Soon!</h3>
-              <p className="text-sm text-muted-foreground">Full Spotify integration is on the way.</p>
-            </div>
+            <SpotifyPlayer />
           </TabsContent>
 
           <TabsContent value="youtube" className="mt-4 space-y-4">
