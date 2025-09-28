@@ -52,8 +52,8 @@ export default function DashboardPage() {
              <GeminiChat />
           </div>
         </div>
+        <Toaster />
       </main>
-      <Toaster />
     </div>
   );
 }
