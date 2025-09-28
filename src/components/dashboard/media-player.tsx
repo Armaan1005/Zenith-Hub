@@ -6,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Music4 } from "lucide-react";
+import { Music4, BookOpen } from "lucide-react";
+import Link from "next/link";
 
 const focusMusic = [
   { title: "Pomodoro with Lofi Girl", embedUrl: "https://www.youtube.com/embed/1oDrJba2PSs", id: "1oDrJba2PSs" },
@@ -46,10 +47,11 @@ export function MediaPlayer() {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="focus">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="focus">Focus Music</TabsTrigger>
             <TabsTrigger value="spotify">Spotify</TabsTrigger>
             <TabsTrigger value="youtube">YouTube</TabsTrigger>
+            <TabsTrigger value="classroom">Classroom</TabsTrigger>
           </TabsList>
 
           <TabsContent value="focus" className="mt-4">
@@ -116,6 +118,20 @@ export function MediaPlayer() {
                 className="rounded-lg"
               ></iframe>
             </AspectRatio>
+          </TabsContent>
+          <TabsContent value="classroom" className="mt-4">
+            <div className="flex h-48 flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 text-center p-6">
+              <BookOpen className="h-10 w-10 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold">Access Google Classroom</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Click the button below to open Google Classroom in a new tab.
+              </p>
+              <Button asChild>
+                <Link href="https://classroom.google.com/" target="_blank" rel="noopener noreferrer">
+                  Open Google Classroom
+                </Link>
+              </Button>
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
