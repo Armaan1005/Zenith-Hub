@@ -21,39 +21,41 @@ export default function DashboardPage() {
   const [pomodoroInterval, setPomodoroInterval] = useState(25);
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-background">
-      <Header />
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">
-        <div className="mx-auto grid w-full max-w-screen-2xl grid-cols-1 items-start gap-6 lg:grid-cols-4">
-          <div className="grid auto-rows-max items-start gap-6 lg:col-span-3">
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="lg:col-span-2">
-                <PomodoroTimer
-                  pomodoroInterval={pomodoroInterval}
-                  setPomodoroInterval={setPomodoroInterval}
-                />
+    <>
+      <div className="flex min-h-screen w-full flex-col bg-background">
+        <Header />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto grid w-full max-w-screen-2xl grid-cols-1 items-start gap-6 lg:grid-cols-4">
+            <div className="grid auto-rows-max items-start gap-6 lg:col-span-3">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="lg:col-span-2">
+                  <PomodoroTimer
+                    pomodoroInterval={pomodoroInterval}
+                    setPomodoroInterval={setPomodoroInterval}
+                  />
+                </div>
+                <ArduinoControl />
               </div>
-              <ArduinoControl />
+              <div className="grid gap-6">
+                <MediaPlayer />
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                <TaskManager
+                  tasks={tasks}
+                  setTasks={setTasks}
+                  pomodoroInterval={pomodoroInterval}
+                />
+                <CalendarView />
+              </div>
             </div>
-            <div className="grid gap-6">
-               <MediaPlayer />
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <TaskManager
-                tasks={tasks}
-                setTasks={setTasks}
-                pomodoroInterval={pomodoroInterval}
-              />
-              <CalendarView />
-            </div>
-          </div>
 
-          <div className="grid auto-rows-max items-start gap-6 lg:col-span-1">
-             <GeminiChat />
+            <div className="grid auto-rows-max items-start gap-6 lg:col-span-1">
+              <GeminiChat />
+            </div>
           </div>
-        </div>
-        <Toaster />
-      </main>
-    </div>
+        </main>
+      </div>
+      <Toaster />
+    </>
   );
 }
