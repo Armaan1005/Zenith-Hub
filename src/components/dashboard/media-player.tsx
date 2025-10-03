@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Music4, ExternalLink, Folder as FolderIcon, File as FileIcon, Upload, FolderPlus, Trash2 } from "lucide-react";
+import { Music4, Folder as FolderIcon, File as FileIcon, Upload, FolderPlus, Trash2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { SpotifyPlayer } from "./spotify-player";
 import {
   Dialog,
@@ -19,6 +19,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 const focusMusic = [
   { title: "Pomodoro with Lofi Girl", embedUrl: "https://www.youtube.com/embed/1oDrJba2PSs", id: "1oDrJba2PSs" },
@@ -33,6 +34,7 @@ function ClassroomManager() {
   const [newFolderName, setNewFolderName] = useState("");
   const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [isLibraryOpen, setIsLibraryOpen] = useState(true);
 
   useEffect(() => {
     try {
@@ -113,94 +115,109 @@ function ClassroomManager() {
 
   return (
      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[60vh]">
-        <div className="md:col-span-1 flex flex-col gap-4">
-            <h3 className="font-semibold text-lg">My Library</h3>
-            <div className="flex gap-2">
-                 <Dialog open={isFolderDialogOpen} onOpenChange={setIsFolderDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button size="sm"><FolderPlus className="mr-2" /> New Folder</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader><DialogTitle>Create New Folder</DialogTitle></DialogHeader>
-                        <div className="py-4">
-                            <Input 
-                                placeholder="Folder name..." 
-                                value={newFolderName} 
-                                onChange={(e) => setNewFolderName(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
-                            />
-                        </div>
-                        <DialogFooter>
-                            <Button onClick={handleCreateFolder}>Create</Button>
-                            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-                <Button size="sm" variant="outline" asChild>
-                    <label htmlFor="pdf-upload"><Upload className="mr-2" /> Upload PDF</label>
-                </Button>
-                <input type="file" id="pdf-upload" accept="application/pdf" onChange={handleFileUpload} className="hidden" />
-            </div>
-            <Card className="flex-1">
-                <CardContent className="p-2">
-                    <ul className="space-y-1">
-                        {folders.map(folder => (
-                            <li key={folder.id}>
-                                <div className="flex items-center">
-                                    <Button
-                                        variant={activeFolder?.id === folder.id ? "secondary" : "ghost"}
-                                        className="w-full justify-start"
-                                        onClick={() => setActiveFolderId(folder.id)}
-                                    >
-                                        <FolderIcon className="mr-2" />
-                                        {folder.name}
-                                    </Button>
-                                    {folders.length > 1 && (
-                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteFolder(folder.id)}>
-                                            <Trash2 className="h-4 w-4 text-muted-foreground" />
+        {isLibraryOpen && (
+            <div className="md:col-span-1 flex flex-col gap-4">
+                <div className="flex justify-between items-center">
+                    <h3 className="font-semibold text-lg">My Library</h3>
+                    <Button variant="ghost" size="icon" onClick={() => setIsLibraryOpen(false)} className="md:hidden">
+                        <PanelLeftClose />
+                    </Button>
+                </div>
+                <div className="flex gap-2">
+                     <Dialog open={isFolderDialogOpen} onOpenChange={setIsFolderDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button size="sm"><FolderPlus className="mr-2" /> New Folder</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader><DialogTitle>Create New Folder</DialogTitle></DialogHeader>
+                            <div className="py-4">
+                                <Input 
+                                    placeholder="Folder name..." 
+                                    value={newFolderName} 
+                                    onChange={(e) => setNewFolderName(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
+                                />
+                            </div>
+                            <DialogFooter>
+                                <Button onClick={handleCreateFolder}>Create</Button>
+                                <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                    <Button size="sm" variant="outline" asChild>
+                        <label htmlFor="pdf-upload"><Upload className="mr-2" /> Upload PDF</label>
+                    </Button>
+                    <input type="file" id="pdf-upload" accept="application/pdf" onChange={handleFileUpload} className="hidden" />
+                </div>
+                <Card className="flex-1">
+                    <CardContent className="p-2">
+                        <ul className="space-y-1">
+                            {folders.map(folder => (
+                                <li key={folder.id}>
+                                    <div className="flex items-center">
+                                        <Button
+                                            variant={activeFolder?.id === folder.id ? "secondary" : "ghost"}
+                                            className="w-full justify-start"
+                                            onClick={() => setActiveFolderId(folder.id)}
+                                        >
+                                            <FolderIcon className="mr-2" />
+                                            {folder.name}
                                         </Button>
+                                        {folders.length > 1 && (
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteFolder(folder.id)}>
+                                                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                    {activeFolder?.id === folder.id && (
+                                        <ul className="pl-6 mt-1 space-y-1">
+                                            {folder.files.map(file => (
+                                               <li key={file.id} className="flex items-center">
+                                                    <Button
+                                                        variant={selectedFile?.id === file.id ? "secondary" : "ghost"}
+                                                        size="sm"
+                                                        className="w-full justify-start h-8"
+                                                        onClick={() => setSelectedFile(file)}
+                                                    >
+                                                        <FileIcon className="mr-2" />
+                                                        <span className="truncate">{file.name}</span>
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteFile(folder.id, file.id)}>
+                                                        <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                                    </Button>
+                                                </li>
+                                            ))}
+                                            {folder.files.length === 0 && <p className="text-xs text-muted-foreground pl-4 py-1">No files yet.</p>}
+                                        </ul>
                                     )}
-                                </div>
-                                {activeFolder?.id === folder.id && (
-                                    <ul className="pl-6 mt-1 space-y-1">
-                                        {folder.files.map(file => (
-                                           <li key={file.id} className="flex items-center">
-                                                <Button
-                                                    variant={selectedFile?.id === file.id ? "secondary" : "ghost"}
-                                                    size="sm"
-                                                    className="w-full justify-start h-8"
-                                                    onClick={() => setSelectedFile(file)}
-                                                >
-                                                    <FileIcon className="mr-2" />
-                                                    <span className="truncate">{file.name}</span>
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteFile(folder.id, file.id)}>
-                                                    <Trash2 className="h-4 w-4 text-muted-foreground" />
-                                                </Button>
-                                            </li>
-                                        ))}
-                                        {folder.files.length === 0 && <p className="text-xs text-muted-foreground pl-4 py-1">No files yet.</p>}
-                                    </ul>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                </CardContent>
-            </Card>
-        </div>
-        <div className="md:col-span-2 h-full">
-            {selectedFile ? (
-              <embed
-                src={selectedFile.dataUrl}
-                type="application/pdf"
-                className="w-full h-full rounded-lg border"
-              />
-            ) : (
-              <div className="flex h-full flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 p-4 text-center">
-                <h3 className="text-lg font-semibold">Study Material Viewer</h3>
-                <p className="text-sm text-muted-foreground">Select a file from your library to view it here.</p>
-              </div>
-            )}
+                                </li>
+                            ))}
+                        </ul>
+                    </CardContent>
+                </Card>
+            </div>
+        )}
+        <div className={cn(
+            "h-full",
+            isLibraryOpen ? "md:col-span-2" : "md:col-span-3"
+        )}>
+            <div className="relative h-full">
+                <Button variant="ghost" size="icon" onClick={() => setIsLibraryOpen(!isLibraryOpen)} className="absolute top-2 left-2 z-10 bg-background/50 hover:bg-background">
+                    {isLibraryOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                </Button>
+                {selectedFile ? (
+                  <embed
+                    src={selectedFile.dataUrl}
+                    type="application/pdf"
+                    className="w-full h-full rounded-lg border"
+                  />
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 p-4 text-center">
+                    <h3 className="text-lg font-semibold">Study Material Viewer</h3>
+                    <p className="text-sm text-muted-foreground">Select a file from your library to view it here, or open the library with the button on the top left.</p>
+                  </div>
+                )}
+            </div>
         </div>
      </div>
   );
@@ -215,15 +232,27 @@ export function MediaPlayer() {
   const handleLoadPlaylist = () => {
     try {
       const url = new URL(playlistUrl);
-      const playlistId = url.searchParams.get("list");
-      if (playlistId) {
-        setYoutubeEmbedUrl(`https://www.youtube.com/embed/videoseries?list=${playlistId}`);
-      } else {
-        // Handle single video URLs as a fallback
-        const videoId = url.search_params.get("v");
-        if (videoId) {
-           setYoutubeEmbedUrl(`https://www.youtube.com/embed/${videoId}`);
+      let newEmbedUrl = "";
+      if (url.hostname === "youtu.be") {
+        const videoId = url.pathname.slice(1);
+        newEmbedUrl = `https://www.youtube.com/embed/${videoId}`;
+      } else if (url.hostname.includes("youtube.com")) {
+        const playlistId = url.searchParams.get("list");
+        if (playlistId) {
+          newEmbedUrl = `https://www.youtube.com/embed/videoseries?list=${playlistId}`;
+        } else {
+          // Handle single video URLs as a fallback
+          const videoId = url.searchParams.get("v");
+          if (videoId) {
+            newEmbedUrl = `https://www.youtube.com/embed/${videoId}`;
+          }
         }
+      }
+
+      if (newEmbedUrl) {
+        setYoutubeEmbedUrl(newEmbedUrl);
+      } else {
+         // Show error to user
       }
     } catch (error) {
       console.error("Invalid YouTube URL", error);
