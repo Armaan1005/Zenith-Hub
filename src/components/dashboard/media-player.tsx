@@ -189,20 +189,18 @@ function ClassroomManager() {
             </Card>
         </div>
         <div className="md:col-span-2">
-            <AspectRatio ratio={16 / 10} className="h-full">
             {selectedFile ? (
-                <iframe
-                    src={selectedFile.dataUrl}
-                    title={selectedFile.name}
-                    className="w-full h-full rounded-lg border"
-                />
+              <embed
+                src={selectedFile.dataUrl}
+                type="application/pdf"
+                className="w-full h-full rounded-lg border"
+              />
             ) : (
-                <div className="flex h-full flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 p-4 text-center">
-                    <h3 className="text-lg font-semibold">Study Material Viewer</h3>
-                    <p className="text-sm text-muted-foreground">Select a file from your library to view it here.</p>
-                </div>
+              <div className="flex h-full flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 p-4 text-center">
+                <h3 className="text-lg font-semibold">Study Material Viewer</h3>
+                <p className="text-sm text-muted-foreground">Select a file from your library to view it here.</p>
+              </div>
             )}
-            </AspectRatio>
         </div>
      </div>
   );
