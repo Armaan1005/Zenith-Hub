@@ -112,7 +112,7 @@ function ClassroomManager() {
   const activeFolder = folders.find(f => f.id === activeFolderId) ?? folders[0];
 
   return (
-     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[70vh]">
+     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[60vh]">
         <div className="md:col-span-1 flex flex-col gap-4">
             <h3 className="font-semibold text-lg">My Library</h3>
             <div className="flex gap-2">
@@ -188,7 +188,7 @@ function ClassroomManager() {
                 </CardContent>
             </Card>
         </div>
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 h-full">
             {selectedFile ? (
               <embed
                 src={selectedFile.dataUrl}
@@ -220,7 +220,7 @@ export function MediaPlayer() {
         setYoutubeEmbedUrl(`https://www.youtube.com/embed/videoseries?list=${playlistId}`);
       } else {
         // Handle single video URLs as a fallback
-        const videoId = url.searchParams.get("v");
+        const videoId = url.search_params.get("v");
         if (videoId) {
            setYoutubeEmbedUrl(`https://www.youtube.com/embed/${videoId}`);
         }
