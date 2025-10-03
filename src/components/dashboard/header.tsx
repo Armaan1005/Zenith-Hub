@@ -10,7 +10,10 @@ export function Header() {
           Zenith Hub
         </h1>
       </div>
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-4">
+        <p className="hidden text-sm text-muted-foreground sm:block">
+          Zero distractions, full focus.
+        </p>
         <ThemeToggle />
       </div>
     </header>
