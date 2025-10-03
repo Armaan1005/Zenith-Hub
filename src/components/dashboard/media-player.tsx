@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, useRef } from "react";
 import type { FileItem, Folder } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Music4, Folder as FolderIcon, File as FileIcon, Upload, FolderPlus, Trash2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Music4, Folder as FolderIcon, File as FileIcon, Upload, FolderPlus, Trash2, PanelLeftClose, PanelLeftOpen, Maximize } from "lucide-react";
 import { SpotifyPlayer } from "./spotify-player";
 import {
   Dialog,
@@ -35,6 +35,7 @@ function ClassroomManager() {
   const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
   const [isLibraryOpen, setIsLibraryOpen] = useState(true);
+  const viewerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
@@ -110,11 +111,19 @@ function ClassroomManager() {
     }
   };
 
+  const handleFullScreen = () => {
+    if (viewerRef.current && viewerRef.current.requestFullscreen) {
+        viewerRef.current.requestFullscreen();
+    }
+  };
 
   const activeFolder = folders.find(f => f.id === activeFolderId) ?? folders[0];
 
   return (
-     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[60vh]">
+     <div className={cn(
+        "grid grid-cols-1 gap-6",
+        isLibraryOpen ? "md:grid-cols-3 h-[60vh]" : "h-full"
+      )}>
         {isLibraryOpen && (
             <div className="md:col-span-1 flex flex-col gap-4">
                 <div className="flex justify-between items-center">
@@ -199,12 +208,19 @@ function ClassroomManager() {
         )}
         <div className={cn(
             "h-full",
-            isLibraryOpen ? "md:col-span-2" : "md:col-span-3"
+            isLibraryOpen ? "md:col-span-2" : "md:col-span-3 min-h-[80vh]"
         )}>
-            <div className="relative h-full">
-                <Button variant="ghost" size="icon" onClick={() => setIsLibraryOpen(!isLibraryOpen)} className="absolute top-2 left-2 z-10 bg-background/50 hover:bg-background">
-                    {isLibraryOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
-                </Button>
+            <div className="relative h-full" ref={viewerRef}>
+                 <div className="absolute top-2 left-2 z-10 flex gap-2">
+                    <Button variant="ghost" size="icon" onClick={() => setIsLibraryOpen(!isLibraryOpen)} className="bg-background/50 hover:bg-background">
+                        {isLibraryOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                    </Button>
+                     {selectedFile && (
+                        <Button variant="ghost" size="icon" onClick={handleFullScreen} className="bg-background/50 hover:bg-background">
+                            <Maximize />
+                        </Button>
+                    )}
+                </div>
                 {selectedFile ? (
                   <embed
                     src={selectedFile.dataUrl}
@@ -344,3 +360,5 @@ export function MediaPlayer() {
     </Card>
   );
 }
+
+    
