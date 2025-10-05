@@ -1,6 +1,7 @@
 
 "use server";
 import { chatWithGemini, type ChatInput } from "@/ai/flows/chat-with-gemini";
+import { getYoutubePlaylistDuration, type GetYoutubePlaylistDurationInput } from "@/ai/flows/get-youtube-playlist-duration";
 import { suggestTaskPriorities, type SuggestTaskPrioritiesInput } from "@/ai/flows/suggest-task-priorities";
 import SpotifyWebApi from 'spotify-web-api-node';
 
@@ -76,4 +77,14 @@ export async function handleSuggestPriorities(input: SuggestTaskPrioritiesInput)
       reasoning: "An error occurred while generating task priorities. Please check your inputs and try again.",
     };
   }
+}
+
+export async function handleGetPlaylistDuration(input: GetYoutubePlaylistDurationInput) {
+    try {
+        const result = await getYoutubePlaylistDuration(input);
+        return result;
+    } catch (error) {
+        console.error("Error in handleGetPlaylistDuration:", error);
+        return { totalDurationSeconds: 0 };
+    }
 }

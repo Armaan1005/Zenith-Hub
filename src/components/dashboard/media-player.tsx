@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useState, useEffect, ChangeEvent, useRef } from "react";
+import { useState, useEffect, ChangeEvent, useRef, useTransition } from "react";
 import type { FileItem, Folder } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Music4, Folder as FolderIcon, File as FileIcon, Upload, FolderPlus, Trash2, PanelLeftClose, PanelLeftOpen, Maximize } from "lucide-react";
+import { Music4, Folder as FolderIcon, File as FileIcon, Upload, FolderPlus, Trash2, PanelLeftClose, PanelLeftOpen, Maximize, Loader2, Timer } from "lucide-react";
 import { SpotifyPlayer } from "./spotify-player";
 import {
   Dialog,
@@ -20,6 +20,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { handleGetPlaylistDuration } from "@/app/actions";
+import { Badge } from "@/components/ui/badge";
 
 const focusMusic = [
   { title: "Pomodoro with Lofi Girl", embedUrl: "https://www.youtube.com/embed/1oDrJba2PSs", id: "1oDrJba2PSs" },
@@ -244,6 +246,17 @@ export function MediaPlayer() {
   const [currentTrack, setCurrentTrack] = useState(focusMusic[0]);
   const [playlistUrl, setPlaylistUrl] = useState("");
   const [youtubeEmbedUrl, setYoutubeEmbedUrl] = useState("https://www.youtube.com/embed/jfKfPfyJRdk");
+  const [totalDuration, setTotalDuration] = useState<number | null>(null);
+  const [isDurationPending, startDurationTransition] = useTransition();
+
+  const getDuration = (url: string) => {
+    if (!url) return;
+    setTotalDuration(null);
+    startDurationTransition(async () => {
+      const result = await handleGetPlaylistDuration({ playlistUrl: url });
+      setTotalDuration(result.totalDurationSeconds);
+    });
+  };
 
   const handleLoadPlaylist = () => {
     try {
@@ -267,6 +280,7 @@ export function MediaPlayer() {
 
       if (newEmbedUrl) {
         setYoutubeEmbedUrl(newEmbedUrl);
+        getDuration(playlistUrl);
       } else {
          // Show error to user
       }
@@ -274,6 +288,19 @@ export function MediaPlayer() {
       console.error("Invalid YouTube URL", error);
       // Optionally, set an error state and show it to the user
     }
+  };
+
+  const formatDuration = (seconds: number | null) => {
+    if (seconds === null || seconds <= 0) return null;
+
+    const h = Math.floor(seconds / 3600).toString();
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+    
+    if (h === '0') {
+        return `${m}:${s}`;
+    }
+    return `${h}:${m}:${s}`;
   };
 
   return (
@@ -336,8 +363,21 @@ export function MediaPlayer() {
                     placeholder="Enter YouTube playlist or video URL..."
                     value={playlistUrl}
                     onChange={(e) => setPlaylistUrl(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleLoadPlaylist()}
                 />
-                <Button onClick={handleLoadPlaylist}>Load</Button>
+                <Button onClick={handleLoadPlaylist} disabled={isDurationPending}>Load</Button>
+                 {isDurationPending && (
+                    <Badge variant="outline" className="h-9 px-4">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Getting time...
+                    </Badge>
+                )}
+                {totalDuration !== null && totalDuration > 0 && !isDurationPending && (
+                    <Badge variant="secondary" className="whitespace-nowrap h-9 px-4">
+                        <Timer className="mr-2"/>
+                        Total: {formatDuration(totalDuration)}
+                    </Badge>
+                )}
             </div>
             <AspectRatio ratio={16 / 9}>
               <iframe
