@@ -293,14 +293,10 @@ export function MediaPlayer() {
   const formatDuration = (seconds: number | null) => {
     if (seconds === null || seconds <= 0) return null;
 
-    const h = Math.floor(seconds / 3600).toString();
-    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60).toString().padStart(2, '0');
     
-    if (h === '0') {
-        return `${m}:${s}`;
-    }
-    return `${h}:${m}:${s}`;
+    return `${m}:${s}`;
   };
 
   return (
@@ -400,5 +396,7 @@ export function MediaPlayer() {
     </Card>
   );
 }
+
+    
 
     
