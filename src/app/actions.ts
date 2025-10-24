@@ -1,14 +1,14 @@
 
 "use server";
-import { headers } from "next/headers";
 import { chatWithGemini, type ChatInput } from "@/ai/flows/chat-with-gemini";
 import { getYoutubePlaylistDuration, type GetYoutubePlaylistDurationInput } from "@/ai/flows/get-youtube-playlist-duration";
 import { suggestTaskPriorities, type SuggestTaskPrioritiesInput } from "@/ai/flows/suggest-task-priorities";
 import SpotifyWebApi from 'spotify-web-api-node';
 
-function getSpotifyApi(redirectUri?: string) {
-  // If no redirectUri is passed, we can still use it for non-auth actions
-  // But for auth, it must be provided.
+// Hardcoded redirect URI for consistency in local development
+const redirectUri = "http://127.0.0.1:9002/callback";
+
+function getSpotifyApi() {
   return new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
@@ -16,17 +16,8 @@ function getSpotifyApi(redirectUri?: string) {
   });
 }
 
-function getRedirectUri() {
-    const headersList = headers();
-    const host = headersList.get('host') || 'localhost:9002';
-    const protocol = host.startsWith('localhost') ? 'http' : 'https';
-    return `${protocol}://${host}/callback`;
-}
-
-
 export async function getSpotifyAuthUrl() {
-  const redirectUri = getRedirectUri();
-  const spotifyApi = getSpotifyApi(redirectUri);
+  const spotifyApi = getSpotifyApi();
   const scopes = [
     'streaming',
     'user-read-email',
@@ -39,8 +30,7 @@ export async function getSpotifyAuthUrl() {
 }
 
 export async function getSpotifyAccessToken(code: string) {
-  const redirectUri = getRedirectUri();
-  const spotifyApi = getSpotifyApi(redirectUri);
+  const spotifyApi = getSpotifyApi();
   try {
     const data = await spotifyApi.authorizationCodeGrant(code);
     return {
@@ -55,9 +45,12 @@ export async function getSpotifyAccessToken(code: string) {
 }
 
 export async function refreshSpotifyAccessToken(refreshToken: string) {
-  // No redirectUri needed for refresh
-  const spotifyApi = getSpotifyApi();
-  spotifyApi.setRefreshToken(refreshToken);
+  const spotifyApi = new SpotifyWebApi({
+    clientId: process.env.SPOTIFY_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    refreshToken: refreshToken,
+  });
+
   try {
     const data = await spotifyApi.refreshAccessToken();
     return {
