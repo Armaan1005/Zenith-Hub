@@ -11,6 +11,7 @@ import { CalendarView } from "@/components/dashboard/calendar-view";
 import { GeminiChat } from "@/components/dashboard/gemini-chat";
 import { ArduinoControl } from "@/components/dashboard/arduino-control";
 import { Toaster } from "@/components/ui/toaster";
+import { CurriculumManager } from "@/components/dashboard/curriculum-manager";
 
 export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([
@@ -40,12 +41,12 @@ export default function DashboardPage() {
                 <MediaPlayer />
               </div>
               <div className="grid gap-6 md:grid-cols-2">
-                <TaskManager
+                 <CurriculumManager />
+                 <TaskManager
                   tasks={tasks}
                   setTasks={setTasks}
                   pomodoroInterval={pomodoroInterval}
                 />
-                <CalendarView />
               </div>
             </div>
 

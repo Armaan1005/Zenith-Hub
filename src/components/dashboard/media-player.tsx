@@ -2,13 +2,13 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent, useRef, useTransition } from "react";
-import type { FileItem, Folder } from "@/lib/types";
+import type { FileItem, Folder, Subject, SubjectTag } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Music4, Folder as FolderIcon, File as FileIcon, Upload, FolderPlus, Trash2, PanelLeftClose, PanelLeftOpen, Maximize, Loader2, Timer } from "lucide-react";
+import { Music4, Folder as FolderIcon, File as FileIcon, Upload, FolderPlus, Trash2, PanelLeftClose, PanelLeftOpen, Maximize, Loader2, Timer, Tag } from "lucide-react";
 import { SpotifyPlayer } from "./spotify-player";
 import {
   Dialog,
@@ -22,6 +22,9 @@ import {
 import { cn } from "@/lib/utils";
 import { handleGetPlaylistDuration } from "@/app/actions";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+
 
 const focusMusic = [
   { title: "Pomodoro with Lofi Girl", embedUrl: "https://www.youtube.com/embed/1oDrJba2PSs", id: "1oDrJba2PSs" },
@@ -37,7 +40,10 @@ function ClassroomManager() {
   const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
   const [isLibraryOpen, setIsLibraryOpen] = useState(true);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const viewerRef = useRef<HTMLDivElement>(null);
+
+  const subjectTags = subjects.map(s => ({ id: s.id, name: s.name }));
 
   useEffect(() => {
     try {
@@ -45,13 +51,25 @@ function ClassroomManager() {
       if (storedFolders) {
         setFolders(JSON.parse(storedFolders));
       } else {
-        // Initialize with a default folder if nothing is stored
         setFolders([{ id: "default", name: "My Study Materials", files: [] }]);
       }
+      const storedSubjects = localStorage.getItem("curriculum_subjects");
+        if (storedSubjects) {
+            setSubjects(JSON.parse(storedSubjects));
+        }
     } catch (error) {
         console.error("Failed to parse classroom folders from localStorage", error);
         setFolders([{ id: "default", name: "My Study Materials", files: [] }]);
     }
+     // Listen for subject changes from other components
+    const handleStorageChange = () => {
+        const storedSubjects = localStorage.getItem("curriculum_subjects");
+        if (storedSubjects) {
+            setSubjects(JSON.parse(storedSubjects));
+        }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   useEffect(() => {
@@ -70,7 +88,7 @@ function ClassroomManager() {
     setIsFolderDialogOpen(false);
   };
   
-  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>, subjectTagId?: string) => {
     const file = e.target.files?.[0];
     const targetFolderId = activeFolderId || folders[0]?.id;
 
@@ -81,6 +99,7 @@ function ClassroomManager() {
           id: crypto.randomUUID(),
           name: file.name,
           dataUrl: event.target?.result as string,
+          subjectTagId: subjectTagId
         };
         setFolders(folders.map(folder =>
           folder.id === targetFolderId
@@ -90,8 +109,7 @@ function ClassroomManager() {
       };
       reader.readAsDataURL(file);
     }
-    // Reset file input
-    e.target.value = '';
+    if(e.target) e.target.value = '';
   };
   
   const deleteFile = (folderId: string, fileId: string) => {
@@ -120,6 +138,61 @@ function ClassroomManager() {
   };
 
   const activeFolder = folders.find(f => f.id === activeFolderId) ?? folders[0];
+  const getSubjectName = (subjectId: string | undefined) => {
+    return subjects.find(s => s.id === subjectId)?.name;
+  };
+
+
+  function UploadButton() {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [popoverOpen, setPopoverOpen] = useState(false);
+
+    return (
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
+                <Button size="sm" variant="outline"><Upload className="mr-2" /> Upload PDF</Button>
+            </PopoverTrigger>
+            <PopoverContent className="p-0 w-64">
+                <Command>
+                    <CommandInput placeholder="Tag with subject..." />
+                    <CommandList>
+                        <CommandEmpty>No subjects found. Create one in Curriculum.</CommandEmpty>
+                        <CommandGroup>
+                             <CommandItem onSelect={() => {
+                                fileInputRef.current?.click();
+                                setPopoverOpen(false);
+                            }}>
+                                <span>(No Subject)</span>
+                            </CommandItem>
+                            {subjectTags.map((tag) => (
+                                <CommandItem
+                                    key={tag.id}
+                                    value={tag.name}
+                                    onSelect={() => {
+                                        fileInputRef.current?.click();
+                                        // Pass subject id to file handler
+                                        fileInputRef.current?.setAttribute('data-subject-id', tag.id);
+                                        setPopoverOpen(false);
+                                    }}
+                                >
+                                    {tag.name}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="application/pdf"
+                    onChange={(e) => handleFileUpload(e, e.currentTarget.getAttribute('data-subject-id') || undefined)}
+                    className="hidden"
+                />
+            </PopoverContent>
+        </Popover>
+    );
+}
+
 
   return (
      <div className={cn(
@@ -155,10 +228,7 @@ function ClassroomManager() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <Button size="sm" variant="outline" asChild>
-                        <label htmlFor="pdf-upload"><Upload className="mr-2" /> Upload PDF</label>
-                    </Button>
-                    <input type="file" id="pdf-upload" accept="application/pdf" onChange={handleFileUpload} className="hidden" />
+                    <UploadButton />
                 </div>
                 <Card className="flex-1">
                     <CardContent className="p-2">
@@ -183,17 +253,24 @@ function ClassroomManager() {
                                     {activeFolder?.id === folder.id && (
                                         <ul className="pl-6 mt-1 space-y-1">
                                             {folder.files.map(file => (
-                                               <li key={file.id} className="flex items-center">
+                                               <li key={file.id} className="flex items-center group">
                                                     <Button
                                                         variant={selectedFile?.id === file.id ? "secondary" : "ghost"}
                                                         size="sm"
-                                                        className="w-full justify-start h-8"
+                                                        className="w-full justify-start h-auto py-1"
                                                         onClick={() => setSelectedFile(file)}
                                                     >
                                                         <FileIcon className="mr-2" />
-                                                        <span className="truncate">{file.name}</span>
+                                                        <div className="flex flex-col items-start">
+                                                            <span className="truncate max-w-[150px]">{file.name}</span>
+                                                            {file.subjectTagId && (
+                                                                <Badge variant="outline" className="text-xs font-normal mt-1">
+                                                                    {getSubjectName(file.subjectTagId)}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                     </Button>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteFile(folder.id, file.id)}>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100" onClick={() => deleteFile(folder.id, file.id)}>
                                                         <Trash2 className="h-4 w-4 text-muted-foreground" />
                                                     </Button>
                                                 </li>
