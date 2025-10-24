@@ -87,3 +87,4 @@ The easiest way to deploy this Next.js application is with [Vercel](https://verc
     - In your Vercel project settings, update the `NEXT_PUBLIC_REDIRECT_URI` environment variable to this new URL.
     - Redeploy the project for the changes to take effect.
 5.  **Deploy.** Vercel will automatically build and deploy your app. Future pushes to the `main` branch will trigger automatic redeployments.
+NEXT_PUBLIC_REDIRECT_URI=https://zenith-hub-delta.vercel.app/callback
