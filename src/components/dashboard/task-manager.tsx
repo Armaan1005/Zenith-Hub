@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { Plus, Trash2, CalendarIcon, Tag } from "lucide-react";
+import { Plus, Trash2, CalendarIcon, Tag, Edit, Save, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { format } from "date-fns";
 
@@ -30,6 +31,10 @@ export function TaskManager({ tasks, setTasks, subjects, pomodoroInterval }: Tas
   const [newTaskText, setNewTaskText] = useState("");
   const [newTaskDate, setNewTaskDate] = useState<Date | undefined>();
   const [newTaskSubjectId, setNewTaskSubjectId] = useState<string | undefined>();
+  
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editingTaskData, setEditingTaskData] = useState<Partial<Task> | null>(null);
+
 
   const getSubjectName = (subjectId: string | undefined) => {
     if (!subjectId) return null;
@@ -62,6 +67,22 @@ export function TaskManager({ tasks, setTasks, subjects, pomodoroInterval }: Tas
         task.id === id ? { ...task, completed: !task.completed } : task
       )
     );
+  };
+  
+  const handleEditStart = (task: Task) => {
+    setEditingTaskId(task.id);
+    setEditingTaskData({ ...task });
+  };
+  
+  const handleEditCancel = () => {
+    setEditingTaskId(null);
+    setEditingTaskData(null);
+  };
+  
+  const handleEditSave = () => {
+    if (!editingTaskId || !editingTaskData) return;
+    setTasks(tasks.map(task => task.id === editingTaskId ? { ...task, ...editingTaskData } as Task : task));
+    handleEditCancel();
   };
 
   const clearCompleted = () => {
@@ -143,38 +164,107 @@ export function TaskManager({ tasks, setTasks, subjects, pomodoroInterval }: Tas
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="flex items-start gap-3 rounded-md p-2 hover:bg-muted/50"
+                className="flex items-start gap-3 rounded-md p-2 hover:bg-muted/50 group"
               >
                 <Checkbox
                   id={`task-${task.id}`}
                   checked={task.completed}
                   onCheckedChange={() => toggleTask(task.id)}
                   className="mt-1"
+                  disabled={!!editingTaskId}
                 />
-                <div className="flex-1">
-                    <label
-                    htmlFor={`task-${task.id}`}
-                    className={cn(
-                        "cursor-pointer text-sm font-medium leading-none transition-colors",
-                        task.completed ? "text-muted-foreground line-through" : "text-foreground"
-                    )}
-                    >
-                    {task.text}
-                    </label>
-                    <div className="flex items-center gap-2 mt-1">
-                        {task.date && (
-                             <Badge variant="outline" className="text-xs">
-                                <CalendarIcon className="mr-1 h-3 w-3" />
-                                {format(task.date, "MMM d")}
-                            </Badge>
-                        )}
-                        {task.subjectId && (
-                             <Badge variant="outline" style={{borderColor: getSubjectColor(task.subjectId), color: getSubjectColor(task.subjectId)}} className="text-xs bg-opacity-10">
-                                {getSubjectName(task.subjectId)}
-                            </Badge>
-                        )}
+                
+                {editingTaskId === task.id ? (
+                  <div className="flex-1 space-y-2">
+                    <Input 
+                      value={editingTaskData?.text || ''}
+                      onChange={(e) => setEditingTaskData({ ...editingTaskData, text: e.target.value })}
+                      className="h-8"
+                    />
+                    <div className="flex gap-2">
+                      <Popover>
+                          <PopoverTrigger asChild>
+                              <Button variant="outline" size="sm" className={cn("justify-start text-left font-normal h-8", !editingTaskData?.date && "text-muted-foreground")}>
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {editingTaskData?.date ? format(editingTaskData.date, "PPP") : <span>Pick a date</span>}
+                              </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                              <Calendar mode="single" selected={editingTaskData?.date} onSelect={(date) => setEditingTaskData({...editingTaskData, date: date || undefined})} initialFocus />
+                          </PopoverContent>
+                      </Popover>
+                       <Popover>
+                          <PopoverTrigger asChild>
+                              <Button variant="outline" size="sm" className="justify-start text-left font-normal h-8">
+                                  <Tag className="mr-2 h-4 w-4" />
+                                  <span>{getSubjectName(editingTaskData?.subjectId) || "Add Tag"}</span>
+                              </Button>
+                          </PopoverTrigger>
+                           <PopoverContent className="p-0 w-56">
+                            <Command>
+                              <CommandInput placeholder="Select subject..." />
+                              <CommandList>
+                                <CommandEmpty>No subjects found.</CommandEmpty>
+                                <CommandGroup>
+                                  <CommandItem onSelect={() => setEditingTaskData({...editingTaskData, subjectId: undefined})}>
+                                    (No Subject)
+                                  </CommandItem>
+                                  {subjects.map(subject => (
+                                    <CommandItem key={subject.id} value={subject.name} onSelect={() => setEditingTaskData({...editingTaskData, subjectId: subject.id})}>
+                                      {subject.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                      </Popover>
                     </div>
-                </div>
+                  </div>
+                ) : (
+                  <div className="flex-1">
+                      <label
+                      htmlFor={`task-${task.id}`}
+                      className={cn(
+                          "cursor-pointer text-sm font-medium leading-none transition-colors",
+                          task.completed ? "text-muted-foreground line-through" : "text-foreground"
+                      )}
+                      >
+                      {task.text}
+                      </label>
+                      <div className="flex items-center gap-2 mt-1">
+                          {task.date && (
+                              <Badge variant="outline" className="text-xs">
+                                  <CalendarIcon className="mr-1 h-3 w-3" />
+                                  {format(task.date, "MMM d")}
+                              </Badge>
+                          )}
+                          {task.subjectId && (
+                              <Badge variant="outline" style={{borderColor: getSubjectColor(task.subjectId), color: getSubjectColor(task.subjectId)}} className="text-xs bg-opacity-10">
+                                  {getSubjectName(task.subjectId)}
+                              </Badge>
+                          )}
+                      </div>
+                  </div>
+                )}
+                 <div className="flex items-center self-start">
+                    {editingTaskId === task.id ? (
+                      <>
+                        <Button onClick={handleEditSave} size="icon" className="h-7 w-7"><Save className="h-4 w-4"/></Button>
+                        <Button onClick={handleEditCancel} size="icon" variant="ghost" className="h-7 w-7"><X className="h-4 w-4"/></Button>
+                      </>
+                    ) : (
+                      <Button 
+                        onClick={() => handleEditStart(task)} 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                        disabled={!!editingTaskId}
+                      >
+                        <Edit className="h-4 w-4"/>
+                      </Button>
+                    )}
+                 </div>
               </motion.div>
             ))}
             </AnimatePresence>
@@ -186,7 +276,7 @@ export function TaskManager({ tasks, setTasks, subjects, pomodoroInterval }: Tas
           onClick={clearCompleted}
           variant="ghost"
           size="sm"
-          disabled={completedCount === 0}
+          disabled={completedCount === 0 || !!editingTaskId}
           className="text-muted-foreground"
         >
           <Trash2 className="mr-2 h-4 w-4" />
@@ -196,3 +286,4 @@ export function TaskManager({ tasks, setTasks, subjects, pomodoroInterval }: Tas
     </Card>
   );
 }
+ 
