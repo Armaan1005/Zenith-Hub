@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, ChangeEvent, useRef, useTransition } from "react";
+import { useState, useEffect, ChangeEvent, useRef, useTransition, Dispatch, SetStateAction } from "react";
 import type { FileItem, Folder, Subject, SubjectTag } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,17 +33,20 @@ const focusMusic = [
   { title: "Peaceful Piano Radio", embedUrl: "https://www.youtube.com/embed/TtkFsfOP9QI", id: "TtkFsfOP9QI" },
 ];
 
-function ClassroomManager() {
+interface ClassroomManagerProps {
+    subjects: Subject[];
+}
+
+function ClassroomManager({ subjects }: ClassroomManagerProps) {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [newFolderName, setNewFolderName] = useState("");
   const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
   const [isLibraryOpen, setIsLibraryOpen] = useState(true);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
   const viewerRef = useRef<HTMLDivElement>(null);
 
-  const subjectTags = subjects.map(s => ({ id: s.id, name: s.name }));
+  const subjectTags: SubjectTag[] = subjects.map(s => ({ id: s.id, name: s.name }));
 
   useEffect(() => {
     try {
@@ -53,23 +56,10 @@ function ClassroomManager() {
       } else {
         setFolders([{ id: "default", name: "My Study Materials", files: [] }]);
       }
-      const storedSubjects = localStorage.getItem("curriculum_subjects");
-        if (storedSubjects) {
-            setSubjects(JSON.parse(storedSubjects));
-        }
     } catch (error) {
         console.error("Failed to parse classroom folders from localStorage", error);
         setFolders([{ id: "default", name: "My Study Materials", files: [] }]);
     }
-     // Listen for subject changes from other components
-    const handleStorageChange = () => {
-        const storedSubjects = localStorage.getItem("curriculum_subjects");
-        if (storedSubjects) {
-            setSubjects(JSON.parse(storedSubjects));
-        }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   useEffect(() => {
@@ -318,13 +308,34 @@ function ClassroomManager() {
   );
 }
 
+interface MediaPlayerProps {
+  subjects: Subject[];
+  setSubjects: Dispatch<SetStateAction<Subject[]>>;
+}
 
-export function MediaPlayer() {
+export function MediaPlayer({ subjects, setSubjects }: MediaPlayerProps) {
   const [currentTrack, setCurrentTrack] = useState(focusMusic[0]);
   const [playlistUrl, setPlaylistUrl] = useState("");
   const [youtubeEmbedUrl, setYoutubeEmbedUrl] = useState("https://www.youtube.com/embed/jfKfPfyJRdk");
   const [totalDuration, setTotalDuration] = useState<number | null>(null);
   const [isDurationPending, startDurationTransition] = useTransition();
+
+  // Listen for storage changes to keep subjects in sync
+  useEffect(() => {
+    const handleStorageChange = () => {
+        const storedSubjects = localStorage.getItem("curriculum_subjects");
+        if (storedSubjects) {
+            try {
+                setSubjects(JSON.parse(storedSubjects));
+            } catch (error) {
+                console.error("Failed to parse subjects from localStorage", error);
+            }
+        }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [setSubjects]);
+
 
   const getDuration = (url: string) => {
     if (!url) return;
@@ -466,14 +477,10 @@ export function MediaPlayer() {
             </AspectRatio>
           </TabsContent>
           <TabsContent value="classroom" className="mt-4">
-            <ClassroomManager />
+            <ClassroomManager subjects={subjects}/>
           </TabsContent>
         </Tabs>
       </CardContent>
     </Card>
   );
 }
-
-    
-
-    

@@ -3,6 +3,8 @@ export interface Task {
   id: string;
   text: string;
   completed: boolean;
+  date?: Date;
+  subjectId?: string;
 }
 
 export interface FileItem {

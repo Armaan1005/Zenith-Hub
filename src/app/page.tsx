@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import type { Task } from "@/lib/types";
+import { useState, useEffect } from "react";
+import type { Task, Subject } from "@/lib/types";
 
 import { Header } from "@/components/dashboard/header";
 import { PomodoroTimer } from "@/components/dashboard/pomodoro-timer";
@@ -14,12 +14,41 @@ import { Toaster } from "@/components/ui/toaster";
 import { CurriculumManager } from "@/components/dashboard/curriculum-manager";
 
 export default function DashboardPage() {
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', text: 'Finish project proposal', completed: false },
-    { id: '2', text: 'Study for calculus exam', completed: false },
-    { id: '3', text: 'Read chapter 4 of history book', completed: true },
-  ]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [pomodoroInterval, setPomodoroInterval] = useState(25);
+
+  useEffect(() => {
+    try {
+      const storedTasks = localStorage.getItem("zenith_tasks");
+      if (storedTasks) {
+        // Dates are stored as ISO strings, need to convert back to Date objects
+        const parsedTasks = JSON.parse(storedTasks).map((task: Task) => ({
+          ...task,
+          date: task.date ? new Date(task.date) : undefined,
+        }));
+        setTasks(parsedTasks);
+      } else {
+        // Initialize with some example data if nothing is stored
+         setTasks([
+            { id: '1', text: 'Finish project proposal', completed: false, date: new Date() },
+            { id: '2', text: 'Study for calculus exam', completed: false },
+            { id: '3', text: 'Read chapter 4 of history book', completed: true },
+        ]);
+      }
+
+      const storedSubjects = localStorage.getItem("curriculum_subjects");
+      if (storedSubjects) {
+        setSubjects(JSON.parse(storedSubjects));
+      }
+    } catch (error) {
+      console.error("Failed to parse from localStorage", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("zenith_tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
   return (
     <>
@@ -38,15 +67,23 @@ export default function DashboardPage() {
                 <ArduinoControl />
               </div>
               <div className="grid gap-6">
-                <MediaPlayer />
+                <MediaPlayer subjects={subjects} setSubjects={setSubjects} />
               </div>
               <div className="grid gap-6 md:grid-cols-2">
-                 <CurriculumManager />
-                 <TaskManager
-                  tasks={tasks}
-                  setTasks={setTasks}
-                  pomodoroInterval={pomodoroInterval}
-                />
+                 <CurriculumManager subjects={subjects} setSubjects={setSubjects} />
+              </div>
+               <div className="grid gap-6 md:grid-cols-5">
+                <div className="md:col-span-3">
+                    <TaskManager
+                        tasks={tasks}
+                        setTasks={setTasks}
+                        subjects={subjects}
+                        pomodoroInterval={pomodoroInterval}
+                    />
+                </div>
+                <div className="md:col-span-2">
+                    <CalendarView tasks={tasks} />
+                </div>
               </div>
             </div>
 

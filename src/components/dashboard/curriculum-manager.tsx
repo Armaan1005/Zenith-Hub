@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Dispatch, SetStateAction } from "react";
 import type { Subject, Chapter } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,25 +30,17 @@ const CHART_COLORS = [
   "hsl(var(--chart-5))",
 ];
 
-export function CurriculumManager() {
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+interface CurriculumManagerProps {
+  subjects: Subject[];
+  setSubjects: Dispatch<SetStateAction<Subject[]>>;
+}
+
+export function CurriculumManager({ subjects, setSubjects }: CurriculumManagerProps) {
   const [newSubjectName, setNewSubjectName] = useState("");
   const [isAddingSubject, setIsAddingSubject] = useState(false);
   const [editingSubjectId, setEditingSubjectId] = useState<string | null>(null);
   const [editingSubjectName, setEditingSubjectName] = useState("");
   const [newChapterNames, setNewChapterNames] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    try {
-      const storedSubjects = localStorage.getItem("curriculum_subjects");
-      if (storedSubjects) {
-        setSubjects(JSON.parse(storedSubjects));
-      }
-    } catch (error) {
-      console.error("Failed to parse subjects from localStorage", error);
-      setSubjects([]);
-    }
-  }, []);
 
   useEffect(() => {
     localStorage.setItem("curriculum_subjects", JSON.stringify(subjects));
@@ -136,7 +128,7 @@ export function CurriculumManager() {
   }, [subjects]);
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col md:col-span-2">
       <CardHeader>
         <CardTitle className="text-xl flex items-center gap-2">
             <BookOpen />
