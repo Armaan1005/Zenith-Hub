@@ -198,28 +198,33 @@ function ClassroomManager({ subjects }: ClassroomManagerProps) {
                         <PanelLeftClose />
                     </Button>
                 </div>
-                <div className="flex gap-2">
-                     <Dialog open={isFolderDialogOpen} onOpenChange={setIsFolderDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button size="sm"><FolderPlus className="mr-2" /> New Folder</Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader><DialogTitle>Create New Folder</DialogTitle></DialogHeader>
-                            <div className="py-4">
-                                <Input 
-                                    placeholder="Folder name..." 
-                                    value={newFolderName} 
-                                    onChange={(e) => setNewFolderName(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
-                                />
-                            </div>
-                            <DialogFooter>
-                                <Button onClick={handleCreateFolder}>Create</Button>
-                                <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                    <UploadButton />
+                <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                        <Dialog open={isFolderDialogOpen} onOpenChange={setIsFolderDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button size="sm"><FolderPlus className="mr-2" /> New Folder</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader><DialogTitle>Create New Folder</DialogTitle></DialogHeader>
+                                <div className="py-4">
+                                    <Input 
+                                        placeholder="Folder name..." 
+                                        value={newFolderName} 
+                                        onChange={(e) => setNewFolderName(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
+                                    />
+                                </div>
+                                <DialogFooter>
+                                    <Button onClick={handleCreateFolder}>Create</Button>
+                                    <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                        <UploadButton />
+                    </div>
+                    <p className="text-xs text-muted-foreground px-1">
+                        First Click on New Folder then Select Subject then Upload pdf
+                    </p>
                 </div>
                 <Card className="flex-1">
                     <CardContent className="p-2">
