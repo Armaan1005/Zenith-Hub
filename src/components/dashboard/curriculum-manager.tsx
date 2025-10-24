@@ -135,11 +135,11 @@ export function CurriculumManager({ subjects, setSubjects }: CurriculumManagerPr
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-96">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-4">
                 <h3 className="font-semibold">Chapter Checklist</h3>
                 <ScrollArea className="pr-4 flex-1">
-                    <Accordion type="multiple" className="w-full">
+                    <Accordion type="single" collapsible className="w-full">
                     {subjects.map(subject => (
                         <AccordionItem key={subject.id} value={subject.id}>
                             <div className="flex items-center group w-full">
@@ -159,15 +159,15 @@ export function CurriculumManager({ subjects, setSubjects }: CurriculumManagerPr
                                 <div className="flex items-center pl-2">
                                 {editingSubjectId === subject.id ? (
                                     <>
-                                        <Button onClick={(e) => {e.stopPropagation(); saveEditing(subject.id)}} size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
-                                        <Button onClick={(e) => {e.stopPropagation(); setEditingSubjectId(null);}} size="icon" variant="ghost" className="h-8 w-8"><X className="h-4 w-4"/></Button>
+                                        <Button onClick={() => saveEditing(subject.id)} size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
+                                        <Button onClick={() => setEditingSubjectId(null)} size="icon" variant="ghost" className="h-8 w-8"><X className="h-4 w-4"/></Button>
                                     </>
                                 ) : (
                                    <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button onClick={(e) => {e.stopPropagation(); startEditing(subject)}} size="icon" variant="ghost" className="h-8 w-8"><Edit className="h-4 w-4 text-muted-foreground"/></Button>
+                                        <Button onClick={() => startEditing(subject)} size="icon" variant="ghost" className="h-8 w-8"><Edit className="h-4 w-4 text-muted-foreground"/></Button>
                                         <Dialog onOpenChange={(open) => !open && setEditingSubjectId(null)}>
                                             <DialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={e => e.stopPropagation()}><Palette className="h-4 w-4 text-muted-foreground"/></Button>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8"><Palette className="h-4 w-4 text-muted-foreground"/></Button>
                                             </DialogTrigger>
                                             <DialogContent>
                                                 <DialogHeader><DialogTitle>Pick Color for {subject.name}</DialogTitle></DialogHeader>
@@ -184,7 +184,7 @@ export function CurriculumManager({ subjects, setSubjects }: CurriculumManagerPr
                                                 </div>
                                             </DialogContent>
                                         </Dialog>
-                                        <Button onClick={(e) => {e.stopPropagation(); deleteSubject(subject.id)}} size="icon" variant="ghost" className="h-8 w-8 text-destructive/70 hover:text-destructive"><Trash2 className="h-4 w-4"/></Button>
+                                        <Button onClick={() => deleteSubject(subject.id)} size="icon" variant="ghost" className="h-8 w-8 text-destructive/70 hover:text-destructive"><Trash2 className="h-4 w-4"/></Button>
                                     </div>
                                 )}
                                 </div>
@@ -249,7 +249,7 @@ export function CurriculumManager({ subjects, setSubjects }: CurriculumManagerPr
                  <h3 className="font-semibold">Progress Overview</h3>
                  <div className="flex-1 w-full h-full min-h-[200px]">
                     {chartData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={250}>
                            <BarChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" tick={{ fill: 'hsl(var(--foreground))' }} tickLine={{ stroke: 'hsl(var(--foreground))' }}/>
