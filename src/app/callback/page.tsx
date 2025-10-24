@@ -30,9 +30,11 @@ function CallbackContent() {
           if ('accessToken' in data && data.accessToken) {
             const expiresAt = Date.now() + data.expiresIn! * 1000;
             localStorage.setItem(LS_ACCESS_TOKEN, data.accessToken);
-            localStorage.setItem(LS_REFRESH_TOKEN, data.refreshToken!);
+            if (data.refreshToken) {
+              localStorage.setItem(LS_REFRESH_TOKEN, data.refreshToken);
+            }
             localStorage.setItem(LS_EXPIRES_AT, expiresAt.toString());
-            // Immediately redirect on success
+            // Immediately redirect to the homepage on success
             router.push('/');
           } else {
             setError('Failed to retrieve Spotify access token. Redirecting to homepage...');
