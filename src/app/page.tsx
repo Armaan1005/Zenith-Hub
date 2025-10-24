@@ -17,8 +17,10 @@ export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [pomodoroInterval, setPomodoroInterval] = useState(25);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     try {
       const storedTasks = localStorage.getItem("zenith_tasks");
       if (storedTasks) {
@@ -29,7 +31,7 @@ export default function DashboardPage() {
         }));
         setTasks(parsedTasks);
       } else {
-        // Initialize with some example data if nothing is stored
+        // Initialize with example data only on the client
          setTasks([
             { id: '1', text: 'Finish project proposal', completed: false, date: new Date() },
             { id: '2', text: 'Study for calculus exam', completed: false },
@@ -43,12 +45,27 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error("Failed to parse from localStorage", error);
+       // Set default example tasks on error as well
+       setTasks([
+            { id: '1', text: 'Finish project proposal', completed: false, date: new Date() },
+            { id: '2', text: 'Study for calculus exam', completed: false },
+            { id: '3', text: 'Read chapter 4 of history book', completed: true },
+        ]);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("zenith_tasks", JSON.stringify(tasks));
-  }, [tasks]);
+    // Only run localStorage logic on the client
+    if (isClient) {
+      localStorage.setItem("zenith_tasks", JSON.stringify(tasks));
+    }
+  }, [tasks, isClient]);
+
+  // Render a loading state or nothing until the client has mounted
+  // This prevents rendering components that rely on client-side data on the server
+  if (!isClient) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <>
