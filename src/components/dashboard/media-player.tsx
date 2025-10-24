@@ -136,50 +136,51 @@ function ClassroomManager({ subjects }: ClassroomManagerProps) {
   function UploadButton() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [popoverOpen, setPopoverOpen] = useState(false);
+    const [selectedSubjectId, setSelectedSubjectId] = useState<string | undefined>();
+
+    const triggerFileInput = (subjectId?: string) => {
+        setSelectedSubjectId(subjectId);
+        fileInputRef.current?.click();
+        setPopoverOpen(false);
+    }
 
     return (
-        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-            <PopoverTrigger asChild>
-                <Button size="sm" variant="outline"><Upload className="mr-2" /> Upload PDF</Button>
-            </PopoverTrigger>
-            <PopoverContent className="p-0 w-64">
-                <Command>
-                    <CommandInput placeholder="Tag with subject..." />
-                    <CommandList>
-                        <CommandEmpty>No subjects found. Create one in Curriculum.</CommandEmpty>
-                        <CommandGroup>
-                             <CommandItem onSelect={() => {
-                                fileInputRef.current?.click();
-                                setPopoverOpen(false);
-                            }}>
-                                <span>(No Subject)</span>
-                            </CommandItem>
-                            {subjectTags.map((tag) => (
-                                <CommandItem
-                                    key={tag.id}
-                                    value={tag.name}
-                                    onSelect={() => {
-                                        fileInputRef.current?.click();
-                                        // Pass subject id to file handler
-                                        fileInputRef.current?.setAttribute('data-subject-id', tag.id);
-                                        setPopoverOpen(false);
-                                    }}
-                                >
-                                    {tag.name}
+        <>
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                <PopoverTrigger asChild>
+                    <Button size="sm" variant="outline"><Upload className="mr-2" /> Upload PDF</Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0 w-64">
+                    <Command>
+                        <CommandInput placeholder="Tag with subject..." />
+                        <CommandList>
+                            <CommandEmpty>No subjects found. Create one in Curriculum.</CommandEmpty>
+                            <CommandGroup>
+                                <CommandItem onSelect={() => triggerFileInput(undefined)}>
+                                    <span>(No Subject)</span>
                                 </CommandItem>
-                            ))}
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="application/pdf"
-                    onChange={(e) => handleFileUpload(e, e.currentTarget.getAttribute('data-subject-id') || undefined)}
-                    className="hidden"
-                />
-            </PopoverContent>
-        </Popover>
+                                {subjectTags.map((tag) => (
+                                    <CommandItem
+                                        key={tag.id}
+                                        value={tag.name}
+                                        onSelect={() => triggerFileInput(tag.id)}
+                                    >
+                                        {tag.name}
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        </CommandList>
+                    </Command>
+                </PopoverContent>
+            </Popover>
+            <input
+                type="file"
+                ref={fileInputRef}
+                accept="application/pdf"
+                onChange={(e) => handleFileUpload(e, selectedSubjectId)}
+                className="hidden"
+            />
+        </>
     );
 }
 
