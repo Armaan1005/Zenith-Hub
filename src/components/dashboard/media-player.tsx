@@ -223,7 +223,7 @@ function ClassroomManager({ subjects }: ClassroomManagerProps) {
                         <UploadButton />
                     </div>
                     <p className="text-xs text-muted-foreground px-1">
-                        First Click on New Folder then Select Subject then Upload pdf
+                        First, select or create a folder, then choose a subject tag to upload your PDF.
                     </p>
                 </div>
                 <Card className="flex-1">
