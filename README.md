@@ -62,7 +62,7 @@ Follow these instructions to set up and run the project on your local machine.
     SPOTIFY_CLIENT_SECRET=
 
     # The redirect URI for Spotify OAuth. For local development, this is typically:
-    NEXT_PUBLIC_REDIRECT_URI=http://localhost:9002/callback
+    NEXT_PUBLIC_REDIRECT_URI=http://127.0.0.1:8888/callback
     ```
 
 4.  **Run the development server:**
@@ -70,7 +70,7 @@ Follow these instructions to set up and run the project on your local machine.
     npm run dev
     ```
 
-    Open [http://localhost:9002](http://localhost:9002) in your browser to see the application.
+    Open [http://localhost:8888](http://localhost:8888) in your browser to see the application.
 
 ---
 

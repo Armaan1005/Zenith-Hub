@@ -9,7 +9,7 @@ function getSpotifyApi() {
   return new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    redirectUri: process.env.NEXT_PUBLIC_REDIRECT_URI,
+    redirectUri: 'http://127.0.0.1:8888/callback',
   });
 }
 
