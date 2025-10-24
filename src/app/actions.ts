@@ -5,14 +5,11 @@ import { getYoutubePlaylistDuration, type GetYoutubePlaylistDurationInput } from
 import { suggestTaskPriorities, type SuggestTaskPrioritiesInput } from "@/ai/flows/suggest-task-priorities";
 import SpotifyWebApi from 'spotify-web-api-node';
 
-// Hardcoded redirect URI for consistency in local development
-const redirectUri = "http://127.0.0.1:9002/callback";
-
 function getSpotifyApi() {
   return new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    redirectUri: redirectUri,
+    redirectUri: process.env.NEXT_PUBLIC_REDIRECT_URI,
   });
 }
 
