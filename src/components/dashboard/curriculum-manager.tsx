@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo, Dispatch, SetStateAction } from "react";
@@ -44,8 +45,6 @@ export function CurriculumManager({ subjects, setSubjects }: CurriculumManagerPr
 
   useEffect(() => {
     localStorage.setItem("curriculum_subjects", JSON.stringify(subjects));
-    // Dispatch a storage event to notify other components like ClassroomManager
-    window.dispatchEvent(new Event('storage'));
   }, [subjects]);
 
   const handleAddSubject = () => {
@@ -277,3 +276,5 @@ export function CurriculumManager({ subjects, setSubjects }: CurriculumManagerPr
     </Card>
   );
 }
+
+    
