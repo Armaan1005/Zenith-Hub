@@ -82,7 +82,7 @@ export default function DashboardPage() {
                     />
                 </div>
                 <div className="md:col-span-2">
-                    <CalendarView tasks={tasks} />
+                    <CalendarView tasks={tasks} subjects={subjects} />
                 </div>
               </div>
             </div>

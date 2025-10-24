@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { isSameDay } from "date-fns";
-import type { Task } from "@/lib/types";
+import type { Task, Subject } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
@@ -11,29 +11,35 @@ import { cn } from "@/lib/utils";
 
 interface CalendarViewProps {
   tasks: Task[];
+  subjects: Subject[];
 }
 
-export function CalendarView({ tasks }: CalendarViewProps) {
+export function CalendarView({ tasks, subjects }: CalendarViewProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const tasksByDate = useMemo(() => {
-    const grouped: Record<string, Task[]> = {};
-    tasks.forEach(task => {
-      if (task.date) {
-        const day = task.date.toISOString().split('T')[0];
-        if (!grouped[day]) {
-          grouped[day] = [];
+    const tasksByDate = useMemo(() => {
+        const grouped: Record<string, Task[]> = {};
+        tasks.forEach(task => {
+        if (task.date) {
+            const day = task.date.toISOString().split('T')[0];
+            if (!grouped[day]) {
+            grouped[day] = [];
+            }
+            grouped[day].push(task);
         }
-        grouped[day].push(task);
-      }
-    });
-    return grouped;
-  }, [tasks]);
+        });
+        return grouped;
+    }, [tasks]);
 
-  const selectedDayTasks = useMemo(() => {
-    if (!date) return [];
-    return tasks.filter(task => task.date && isSameDay(task.date, date));
-  }, [date, tasks]);
+    const getSubjectColor = (subjectId: string | undefined) => {
+        if (!subjectId) return 'hsl(var(--foreground))';
+        return subjects.find(s => s.id === subjectId)?.color;
+    };
+
+    const selectedDayTasks = useMemo(() => {
+        if (!date) return [];
+        return tasks.filter(task => task.date && isSameDay(task.date, date));
+    }, [date, tasks]);
 
   return (
     <Card className="flex flex-col h-full">
@@ -59,14 +65,26 @@ export function CalendarView({ tasks }: CalendarViewProps) {
           }}
            components={{
             DayContent: (props) => {
-              const dayString = props.date.toISOString().split('T')[0];
-              const hasTask = tasksByDate[dayString]?.length > 0;
-              return (
-                <div className="relative">
-                  {props.date.getDate()}
-                  {hasTask && <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-primary" />}
-                </div>
-              );
+                const dayString = props.date.toISOString().split('T')[0];
+                const dayTasks = tasksByDate[dayString] || [];
+                const day = props.date.getDate();
+                
+                return (
+                    <div className="relative w-full h-full flex items-center justify-center">
+                    {day}
+                    {dayTasks.length > 0 && (
+                        <div className="absolute flex space-x-0.5" style={{ bottom: '4px' }}>
+                        {dayTasks.slice(0, 3).map((task, index) => (
+                            <div
+                                key={index}
+                                className="h-1.5 w-1.5 rounded-full"
+                                style={{ backgroundColor: getSubjectColor(task.subjectId) }}
+                            />
+                        ))}
+                        </div>
+                    )}
+                    </div>
+                );
             }
           }}
         />
@@ -79,7 +97,7 @@ export function CalendarView({ tasks }: CalendarViewProps) {
                     <ul className="space-y-2">
                         {selectedDayTasks.map(task => (
                             <li key={task.id} className={cn("text-sm text-muted-foreground flex items-center", task.completed && "line-through")}>
-                                <div className={cn("w-2 h-2 rounded-full mr-2", task.completed ? 'bg-green-500' : 'bg-primary')}></div>
+                                <div className={cn("w-2 h-2 rounded-full mr-2 shrink-0")} style={{backgroundColor: getSubjectColor(task.subjectId)}}></div>
                                 {task.text}
                             </li>
                         ))}
