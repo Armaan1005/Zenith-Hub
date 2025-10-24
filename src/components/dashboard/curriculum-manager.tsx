@@ -151,24 +151,28 @@ export function CurriculumManager() {
                     <Accordion type="multiple" className="w-full">
                     {subjects.map(subject => (
                         <AccordionItem key={subject.id} value={subject.id}>
-                            <AccordionTrigger className="group">
-                                <div className="flex items-center gap-2 flex-1">
+                            <div className="flex items-center group w-full">
+                                <AccordionTrigger>
+                                {editingSubjectId === subject.id ? (
+                                     <Input
+                                        value={editingSubjectName}
+                                        onChange={(e) => setEditingSubjectName(e.target.value)}
+                                        className="h-8"
+                                        onClick={(e) => e.stopPropagation()}
+                                        onKeyDown={(e) => { if (e.key === 'Enter') saveEditing(subject.id)}}
+                                    />
+                                ) : (
+                                    <span style={{ color: subject.color }} className="font-bold">{subject.name}</span>
+                                )}
+                                </AccordionTrigger>
+                                <div className="flex items-center pl-2">
                                 {editingSubjectId === subject.id ? (
                                     <>
-                                        <Input
-                                            value={editingSubjectName}
-                                            onChange={(e) => setEditingSubjectName(e.target.value)}
-                                            className="h-8"
-                                            onClick={(e) => e.stopPropagation()}
-                                            onKeyDown={(e) => { if (e.key === 'Enter') saveEditing(subject.id)}}
-                                        />
                                         <Button onClick={(e) => {e.stopPropagation(); saveEditing(subject.id)}} size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
                                         <Button onClick={(e) => {e.stopPropagation(); setEditingSubjectId(null);}} size="icon" variant="ghost" className="h-8 w-8"><X className="h-4 w-4"/></Button>
                                     </>
                                 ) : (
-                                   <>
-                                    <span style={{ color: subject.color }} className="font-bold">{subject.name}</span>
-                                    <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                   <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                                         <Button onClick={(e) => {e.stopPropagation(); startEditing(subject)}} size="icon" variant="ghost" className="h-8 w-8"><Edit className="h-4 w-4 text-muted-foreground"/></Button>
                                         <Dialog onOpenChange={(open) => !open && setEditingSubjectId(null)}>
                                             <DialogTrigger asChild>
@@ -191,10 +195,9 @@ export function CurriculumManager() {
                                         </Dialog>
                                         <Button onClick={(e) => {e.stopPropagation(); deleteSubject(subject.id)}} size="icon" variant="ghost" className="h-8 w-8 text-destructive/70 hover:text-destructive"><Trash2 className="h-4 w-4"/></Button>
                                     </div>
-                                   </>
                                 )}
                                 </div>
-                            </AccordionTrigger>
+                            </div>
                             <AccordionContent>
                                 <AnimatePresence>
                                 {subject.chapters.map(chapter => (
