@@ -1,20 +1,32 @@
 
 "use server";
+import { headers } from "next/headers";
 import { chatWithGemini, type ChatInput } from "@/ai/flows/chat-with-gemini";
 import { getYoutubePlaylistDuration, type GetYoutubePlaylistDurationInput } from "@/ai/flows/get-youtube-playlist-duration";
 import { suggestTaskPriorities, type SuggestTaskPrioritiesInput } from "@/ai/flows/suggest-task-priorities";
 import SpotifyWebApi from 'spotify-web-api-node';
 
-function getSpotifyApi() {
+function getSpotifyApi(redirectUri?: string) {
+  // If no redirectUri is passed, we can still use it for non-auth actions
+  // But for auth, it must be provided.
   return new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    redirectUri: process.env.NEXT_PUBLIC_REDIRECT_URI,
+    redirectUri: redirectUri,
   });
 }
 
+function getRedirectUri() {
+    const headersList = headers();
+    const host = headersList.get('host') || 'localhost:9002';
+    const protocol = host.startsWith('localhost') ? 'http' : 'https';
+    return `${protocol}://${host}/callback`;
+}
+
+
 export async function getSpotifyAuthUrl() {
-  const spotifyApi = getSpotifyApi();
+  const redirectUri = getRedirectUri();
+  const spotifyApi = getSpotifyApi(redirectUri);
   const scopes = [
     'streaming',
     'user-read-email',
@@ -27,7 +39,8 @@ export async function getSpotifyAuthUrl() {
 }
 
 export async function getSpotifyAccessToken(code: string) {
-  const spotifyApi = getSpotifyApi();
+  const redirectUri = getRedirectUri();
+  const spotifyApi = getSpotifyApi(redirectUri);
   try {
     const data = await spotifyApi.authorizationCodeGrant(code);
     return {
@@ -35,13 +48,14 @@ export async function getSpotifyAccessToken(code: string) {
       refreshToken: data.body['refresh_token'],
       expiresIn: data.body['expires_in'],
     };
-  } catch (error) {
-    console.error('Error getting access token:', error);
-    return { error: 'Failed to get access token' };
+  } catch (error: any) {
+    console.error('Error getting access token:', error.body || error.message);
+    return { error: 'Failed to get access token: ' + (error.body?.error_description || error.message) };
   }
 }
 
 export async function refreshSpotifyAccessToken(refreshToken: string) {
+  // No redirectUri needed for refresh
   const spotifyApi = getSpotifyApi();
   spotifyApi.setRefreshToken(refreshToken);
   try {
