@@ -30,6 +30,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Add this configuration to allow requests from the dev environment
+  experimental: {
+    allowedDevOrigins: [
+        "https://6000-firebase-studio-1758983685697.cluster-ulqnojp5endvgve6krhe7klaws.cloudworkstations.dev",
+        "http://6000-firebase-studio-1758983685697.cluster-ulqnojp5endvgve6krhe7klaws.cloudworkstations.dev"
+    ],
+  },
 };
 
 export default nextConfig;
