@@ -151,18 +151,47 @@ export function CurriculumManager() {
                     <Accordion type="multiple" className="w-full">
                     {subjects.map(subject => (
                         <AccordionItem key={subject.id} value={subject.id}>
-                            <AccordionTrigger>
-                                <div className="flex items-center gap-2">
+                            <AccordionTrigger className="group">
+                                <div className="flex items-center gap-2 flex-1">
                                 {editingSubjectId === subject.id ? (
-                                    <Input
-                                        value={editingSubjectName}
-                                        onChange={(e) => setEditingSubjectName(e.target.value)}
-                                        className="h-8"
-                                        onClick={(e) => e.stopPropagation()}
-                                        onKeyDown={(e) => { if (e.key === 'Enter') saveEditing(subject.id)}}
-                                    />
+                                    <>
+                                        <Input
+                                            value={editingSubjectName}
+                                            onChange={(e) => setEditingSubjectName(e.target.value)}
+                                            className="h-8"
+                                            onClick={(e) => e.stopPropagation()}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') saveEditing(subject.id)}}
+                                        />
+                                        <Button onClick={(e) => {e.stopPropagation(); saveEditing(subject.id)}} size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
+                                        <Button onClick={(e) => {e.stopPropagation(); setEditingSubjectId(null);}} size="icon" variant="ghost" className="h-8 w-8"><X className="h-4 w-4"/></Button>
+                                    </>
                                 ) : (
+                                   <>
                                     <span style={{ color: subject.color }} className="font-bold">{subject.name}</span>
+                                    <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Button onClick={(e) => {e.stopPropagation(); startEditing(subject)}} size="icon" variant="ghost" className="h-8 w-8"><Edit className="h-4 w-4 text-muted-foreground"/></Button>
+                                        <Dialog onOpenChange={(open) => !open && setEditingSubjectId(null)}>
+                                            <DialogTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={e => e.stopPropagation()}><Palette className="h-4 w-4 text-muted-foreground"/></Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader><DialogTitle>Pick Color for {subject.name}</DialogTitle></DialogHeader>
+                                                <div className="flex gap-2 py-4">
+                                                    {CHART_COLORS.map(color => (
+                                                        <DialogClose key={color} asChild>
+                                                        <Button
+                                                            className="w-10 h-10 rounded-full"
+                                                            style={{ backgroundColor: color }}
+                                                            onClick={() => handleColorChange(subject.id, color)}
+                                                        />
+                                                        </DialogClose>
+                                                    ))}
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                        <Button onClick={(e) => {e.stopPropagation(); deleteSubject(subject.id)}} size="icon" variant="ghost" className="h-8 w-8 text-destructive/70 hover:text-destructive"><Trash2 className="h-4 w-4"/></Button>
+                                    </div>
+                                   </>
                                 )}
                                 </div>
                             </AccordionTrigger>
@@ -250,44 +279,6 @@ export function CurriculumManager() {
             </div>
         </div>
       </CardContent>
-      <CardFooter className="flex-wrap gap-2">
-         {subjects.map(subject => (
-            <div key={subject.id} className="flex items-center gap-1">
-                 {editingSubjectId === subject.id ? (
-                     <>
-                        <Button onClick={() => saveEditing(subject.id)} size="sm" variant="secondary"><Save className="h-4 w-4" /></Button>
-                        <Button onClick={() => setEditingSubjectId(null)} size="sm" variant="ghost"><X className="h-4 w-4" /></Button>
-                     </>
-                 ) : (
-                    <Button onClick={() => startEditing(subject)} size="sm" variant="ghost" className="text-muted-foreground">
-                        <Edit className="mr-2 h-4 w-4" /> Edit {subject.name}
-                    </Button>
-                 )}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><Palette className="h-4 w-4"/></Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader><DialogTitle>Pick Color for {subject.name}</DialogTitle></DialogHeader>
-                        <div className="flex gap-2 py-4">
-                            {CHART_COLORS.map(color => (
-                                <DialogClose key={color} asChild>
-                                <Button
-                                    className="w-10 h-10 rounded-full"
-                                    style={{ backgroundColor: color }}
-                                    onClick={() => handleColorChange(subject.id, color)}
-                                />
-                                </DialogClose>
-                            ))}
-                        </div>
-                    </DialogContent>
-                </Dialog>
-                <Button onClick={() => deleteSubject(subject.id)} size="sm" variant="ghost" className="text-destructive hover:text-destructive">
-                    <Trash2 className="mr-2 h-4 w-4" /> Delete {subject.name}
-                </Button>
-            </div>
-         ))}
-      </CardFooter>
     </Card>
   );
 }
