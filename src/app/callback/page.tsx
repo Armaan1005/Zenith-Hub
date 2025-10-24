@@ -32,7 +32,7 @@ function CallbackContent() {
             localStorage.setItem(LS_ACCESS_TOKEN, data.accessToken);
             localStorage.setItem(LS_REFRESH_TOKEN, data.refreshToken!);
             localStorage.setItem(LS_EXPIRES_AT, expiresAt.toString());
-            setMessage("Authentication successful! Redirecting...");
+            // Immediately redirect on success
             router.push('/');
           } else {
             setError('Failed to retrieve Spotify access token. Redirecting to homepage...');
