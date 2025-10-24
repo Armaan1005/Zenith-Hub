@@ -135,10 +135,10 @@ export function CurriculumManager({ subjects, setSubjects }: CurriculumManagerPr
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <div className="md:col-span-2 flex flex-col gap-4">
                 <h3 className="font-semibold">Chapter Checklist</h3>
-                <ScrollArea className="pr-4 flex-1">
+                <ScrollArea className="pr-4 flex-1 h-96">
                     <Accordion type="single" collapsible className="w-full">
                     {subjects.map(subject => (
                         <AccordionItem key={subject.id} value={subject.id}>
@@ -245,11 +245,11 @@ export function CurriculumManager({ subjects, setSubjects }: CurriculumManagerPr
                     </Button>
                 )}
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="md:col-span-3 flex flex-col gap-4">
                  <h3 className="font-semibold">Progress Overview</h3>
                  <div className="flex-1 w-full h-full min-h-[200px]">
                     {chartData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={250}>
+                        <ResponsiveContainer width="100%" height="100%">
                            <BarChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" tick={{ fill: 'hsl(var(--foreground))' }} tickLine={{ stroke: 'hsl(var(--foreground))' }}/>
