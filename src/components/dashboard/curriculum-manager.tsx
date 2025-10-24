@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Plus, Trash2, Edit, Save, X, BookOpen, Palette } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import {
   Dialog,
   DialogContent,
@@ -227,12 +227,19 @@ export function CurriculumManager() {
                  <div className="flex-1 w-full h-full min-h-[200px]">
                     {chartData.length > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie data={chartData} dataKey="progress" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
-                                    {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
-                                </Pie>
-                                <Tooltip formatter={(value) => `${value}% completed`} />
-                            </PieChart>
+                           <BarChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" tick={{ fill: 'hsl(var(--foreground))' }} tickLine={{ stroke: 'hsl(var(--foreground))' }}/>
+                                <YAxis domain={[0, 100]} unit="%" tick={{ fill: 'hsl(var(--foreground))' }} />
+                                <Tooltip
+                                    cursor={{fill: 'hsl(var(--muted))'}}
+                                    contentStyle={{
+                                        backgroundColor: 'hsl(var(--background))',
+                                        borderColor: 'hsl(var(--border))'
+                                    }}
+                                />
+                                <Bar dataKey="progress" radius={[4, 4, 0, 0]} />
+                            </BarChart>
                         </ResponsiveContainer>
                     ) : (
                         <div className="flex h-full items-center justify-center rounded-lg border-2 border-dashed text-center text-muted-foreground">
